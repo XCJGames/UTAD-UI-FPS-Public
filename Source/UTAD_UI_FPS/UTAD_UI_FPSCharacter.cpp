@@ -11,6 +11,7 @@
 // UI
 #include "Blueprint/UserWidget.h"
 #include "UI/PlayerHUD.h"
+#include "UI/GameOver.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUTAD_UI_FPSCharacter
@@ -19,10 +20,10 @@ AUTAD_UI_FPSCharacter::AUTAD_UI_FPSCharacter()
 {
 	// Character doesnt have a rifle at start
 	bHasRifle = false;
-	
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
@@ -60,6 +61,7 @@ void AUTAD_UI_FPSCharacter::BeginPlay()
 		PlayerHUDInstance = CreateWidget<UPlayerHUD>(GetWorld(), PlayerHUDWidget);
 		PlayerHUDInstance->AddToViewport();
 		PlayerHUDInstance->ShowNoWeapon();
+		OnPlayerHealthChanged.ExecuteIfBound(Health, MaxHealth);
 	}
 	else
 	{
@@ -120,6 +122,21 @@ void AUTAD_UI_FPSCharacter::SetHealth(int NewHealth)
 	if (ClampedNewHealth != Health)
 	{
 		Health = ClampedNewHealth;
+		OnPlayerHealthChanged.ExecuteIfBound(Health, MaxHealth);
+		if (Health == 0)
+		{
+			if (GameOverWidget)
+			{
+				GameOverInstance = CreateWidget<UGameOver>(GetWorld(), GameOverWidget);
+				GameOverInstance->AddToViewport();
+				GameOverInstance->Show();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Game Over Widget not assigned to UTAD_UI_FPSCharacter"));
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Game Over Widget not assigned to UTAD_UI_FPSCharacter"));
+			}
+		}
 	}
 }
 
@@ -152,6 +169,7 @@ bool AUTAD_UI_FPSCharacter::GetHasRifle()
 void AUTAD_UI_FPSCharacter::SetTotalBullets(int NewTotalBullets)
 {
 	TotalBullets = NewTotalBullets;
+	OnTotalBulletsChanged.ExecuteIfBound(TotalBullets);
 }
 
 int AUTAD_UI_FPSCharacter::GetTotalBullets()

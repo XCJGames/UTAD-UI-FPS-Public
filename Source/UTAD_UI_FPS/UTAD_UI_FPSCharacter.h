@@ -16,14 +16,18 @@ class UTP_WeaponComponent;
 struct FInputActionValue;
 
 class UPlayerHUD;
+class UGameOver;
 
-UCLASS(config=Game)
+DECLARE_DELEGATE_TwoParams(FOnPlayerHealthChanged, int /* NewHealth */, int /* MaxHealth */);
+DECLARE_DELEGATE_OneParam(FOnTotalBulletsChanged, int /* TotalBullets */);
+
+UCLASS(config = Game)
 class AUTAD_UI_FPSCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
 
 	/** First person camera */
@@ -35,18 +39,18 @@ class AUTAD_UI_FPSCharacter : public ACharacter
 	UTP_WeaponComponent* AttachedWeaponComponent;
 
 	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
 
 	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JumpAction;
 
 	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
-	
+
 public:
 	AUTAD_UI_FPSCharacter();
 
@@ -54,7 +58,7 @@ protected:
 	virtual void BeginPlay();
 
 public:
-		
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -113,6 +117,10 @@ public:
 
 	void SetAttachedWeaponComponent(UTP_WeaponComponent* WeaponComponent);
 
+	// Delegates
+	FOnPlayerHealthChanged OnPlayerHealthChanged;
+	FOnTotalBulletsChanged OnTotalBulletsChanged;
+
 	/****************************************************/
 	/************************ UI ************************/
 	/****************************************************/
@@ -120,6 +128,10 @@ public:
 	/** Widget Blueprints that will be used to create the instances */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	TSubclassOf<UPlayerHUD> PlayerHUDWidget;
+
+	/** Widget Blueprints that will be used to create the instances */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<UGameOver> GameOverWidget;
 
 protected:
 	/** Called for movement input */
@@ -149,5 +161,6 @@ private:
 
 	/** Instances that will be created and showed on viewport */
 	UPlayerHUD* PlayerHUDInstance;
+	UGameOver* GameOverInstance;
 };
 

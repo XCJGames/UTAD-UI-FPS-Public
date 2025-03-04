@@ -7,14 +7,17 @@
 #include "PlayerHealthBar.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UTAD_UI_FPS_API UPlayerHealthBar : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UProgressBar* PlayerHealthBar;
 
 	UFUNCTION(BlueprintCallable, Category = Visibility)
 	void Show();

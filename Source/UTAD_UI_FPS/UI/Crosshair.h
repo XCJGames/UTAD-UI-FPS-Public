@@ -7,13 +7,13 @@
 #include "Crosshair.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UTAD_UI_FPS_API UCrosshair : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = Visibility)

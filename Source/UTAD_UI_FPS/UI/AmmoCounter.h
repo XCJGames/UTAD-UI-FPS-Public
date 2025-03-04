@@ -7,13 +7,18 @@
 #include "AmmoCounter.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UTAD_UI_FPS_API UAmmoCounter : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* CurrentAmmo;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* TotalAmmo;
 
 	UFUNCTION(BlueprintCallable, Category = Visibility)
 	void Show();

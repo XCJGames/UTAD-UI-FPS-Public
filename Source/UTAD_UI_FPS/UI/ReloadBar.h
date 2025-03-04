@@ -7,7 +7,7 @@
 #include "ReloadBar.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UTAD_UI_FPS_API UReloadBar : public UUserWidget
@@ -15,6 +15,9 @@ class UTAD_UI_FPS_API UReloadBar : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UProgressBar* ReloadBar;
 
 	UFUNCTION(BlueprintCallable, Category = Visibility)
 	void Show();

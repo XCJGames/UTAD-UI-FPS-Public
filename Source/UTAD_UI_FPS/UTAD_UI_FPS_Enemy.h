@@ -9,13 +9,13 @@
 class UWidgetComponent;
 
 /**
- * 
+ *
  */
 UCLASS()
 class UTAD_UI_FPS_API AUTAD_UI_FPS_Enemy : public AStaticMeshActor
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -47,5 +47,13 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+private:
+
+	/****************************************************/
+	/************************ UI ************************/
+	/****************************************************/
+
+	UWidgetComponent* EnemyHealthBarComponent;
 
 };

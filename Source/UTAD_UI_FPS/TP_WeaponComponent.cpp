@@ -30,6 +30,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		ReloadTimer += DeltaTime;
 		// To test ReloadTimer
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%f"), ReloadTimer));
+		OnReloading.ExecuteIfBound(ReloadTimer / RELOAD_TIME);
 	}
 }
 
@@ -55,22 +56,22 @@ void UTP_WeaponComponent::Fire()
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
+
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	
+
 			// Spawn the projectile at the muzzle
 			World->SpawnActor<AUTAD_UI_FPSProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
-	
+
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
 	}
-	
+
 	// Try and play a firing animation if specified
 	if (FireAnimation != nullptr)
 	{
@@ -83,6 +84,8 @@ void UTP_WeaponComponent::Fire()
 	}
 
 	--CurrentNumBullets;
+
+	OnCurrentNumBulletsChanged.ExecuteIfBound(CurrentNumBullets);
 }
 
 void UTP_WeaponComponent::StartReload()
@@ -112,6 +115,7 @@ void UTP_WeaponComponent::CompleteReload()
 	}
 
 	bIsReloading = false;
+	OnReloading.ExecuteIfBound(0.f);
 
 	int playerBullets = Character->GetTotalBullets();
 	playerBullets += CurrentNumBullets;
@@ -119,6 +123,7 @@ void UTP_WeaponComponent::CompleteReload()
 	CurrentNumBullets = __min(MagazineSize, playerBullets);
 
 	Character->SetTotalBullets(playerBullets - CurrentNumBullets);
+	OnCurrentNumBulletsChanged.ExecuteIfBound(CurrentNumBullets);
 }
 
 void UTP_WeaponComponent::CancelReload()
@@ -129,6 +134,7 @@ void UTP_WeaponComponent::CancelReload()
 	}
 
 	bIsReloading = false;
+	OnReloading.ExecuteIfBound(0.f);
 }
 
 int UTP_WeaponComponent::GetMagazineSize()
@@ -164,7 +170,7 @@ void UTP_WeaponComponent::AttachWeapon(AUTAD_UI_FPSCharacter* TargetCharacter)
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
 
 	Character->SetAttachedWeaponComponent(this);
-	
+
 	// switch bHasRifle so the animation blueprint can switch to another animation set
 	Character->SetHasRifle(true);
 
@@ -192,6 +198,10 @@ void UTP_WeaponComponent::AttachWeapon(AUTAD_UI_FPSCharacter* TargetCharacter)
 			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Canceled, this, &UTP_WeaponComponent::CancelReload);
 		}
 	}
+
+	OnReloading.ExecuteIfBound(ReloadTimer / RELOAD_TIME);
+	OnCurrentNumBulletsChanged.ExecuteIfBound(CurrentNumBullets);
+	Character->OnTotalBulletsChanged.ExecuteIfBound(Character->GetTotalBullets());
 }
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
