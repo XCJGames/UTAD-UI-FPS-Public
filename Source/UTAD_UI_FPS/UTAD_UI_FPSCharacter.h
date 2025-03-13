@@ -17,6 +17,9 @@ struct FInputActionValue;
 
 class UPlayerHUD;
 
+DECLARE_DELEGATE_TwoParams(FOnPlayerHealthChanged, int /* NewHealth */, int /* MaxHealth */);
+DECLARE_DELEGATE_OneParam(FOnTotalBulletsChanged, int /* TotalBullets */);
+
 UCLASS(config=Game)
 class AUTAD_UI_FPSCharacter : public ACharacter
 {
@@ -112,6 +115,10 @@ public:
 	void AddBullets(int Bullets);
 
 	void SetAttachedWeaponComponent(UTP_WeaponComponent* WeaponComponent);
+
+	// Delegates
+	FOnPlayerHealthChanged OnPlayerHealthChanged;
+	FOnTotalBulletsChanged OnTotalBulletsChanged;
 
 	/****************************************************/
 	/************************ UI ************************/

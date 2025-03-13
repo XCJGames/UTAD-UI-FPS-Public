@@ -60,6 +60,7 @@ void AUTAD_UI_FPSCharacter::BeginPlay()
 		PlayerHUDInstance = CreateWidget<UPlayerHUD>(GetWorld(), PlayerHUDWidget);
 		PlayerHUDInstance->AddToViewport();
 		PlayerHUDInstance->ShowNoWeapon();
+		OnPlayerHealthChanged.ExecuteIfBound(Health, MaxHealth);
 	}
 	else
 	{
@@ -120,6 +121,7 @@ void AUTAD_UI_FPSCharacter::SetHealth(int NewHealth)
 	if (ClampedNewHealth != Health)
 	{
 		Health = ClampedNewHealth;
+		OnPlayerHealthChanged.ExecuteIfBound(Health, MaxHealth);
 	}
 }
 
@@ -152,6 +154,7 @@ bool AUTAD_UI_FPSCharacter::GetHasRifle()
 void AUTAD_UI_FPSCharacter::SetTotalBullets(int NewTotalBullets)
 {
 	TotalBullets = NewTotalBullets;
+	OnTotalBulletsChanged.ExecuteIfBound(TotalBullets);
 }
 
 int AUTAD_UI_FPSCharacter::GetTotalBullets()

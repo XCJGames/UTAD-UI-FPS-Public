@@ -30,6 +30,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		ReloadTimer += DeltaTime;
 		// To test ReloadTimer
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%f"), ReloadTimer));
+		OnReloading.ExecuteIfBound(ReloadTimer / RELOAD_TIME);
 	}
 }
 
@@ -112,6 +113,7 @@ void UTP_WeaponComponent::CompleteReload()
 	}
 
 	bIsReloading = false;
+	OnReloading.ExecuteIfBound(0.f);
 
 	int playerBullets = Character->GetTotalBullets();
 	playerBullets += CurrentNumBullets;
@@ -129,6 +131,7 @@ void UTP_WeaponComponent::CancelReload()
 	}
 
 	bIsReloading = false;
+	OnReloading.ExecuteIfBound(0.f);
 }
 
 int UTP_WeaponComponent::GetMagazineSize()
@@ -192,6 +195,9 @@ void UTP_WeaponComponent::AttachWeapon(AUTAD_UI_FPSCharacter* TargetCharacter)
 			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Canceled, this, &UTP_WeaponComponent::CancelReload);
 		}
 	}
+
+	OnReloading.ExecuteIfBound(ReloadTimer / RELOAD_TIME);
+	Character->OnTotalBulletsChanged.ExecuteIfBound(Character->GetTotalBullets());
 }
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
